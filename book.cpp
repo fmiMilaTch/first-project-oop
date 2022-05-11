@@ -1,6 +1,6 @@
 #include "book.h"
 
-bool Book::onlyNumbers(const char* text){
+bool Book::onlyNumbers(const char* text){//da otdelia v otdelna f-ia
     for(int i=0; i<ISBN_LEN; i++){
         if(!((text[i]>='0')&&(text[i]<='9'))){
             return false;
@@ -20,6 +20,20 @@ void Book::setText(const char* newText, char* textData, unsigned& textDataLenght
     else {
         textData=new char[8];//da napravia constanta=8;
         return setText("Unknown",textData,newTextLenght);//malko zavisi ot povedeneieto na kompilatora za da prevurne unknown v const char...
+
+    }
+}
+void Book::setFileName(const char* newText, char* textData, unsigned& textDataLenght){
+    if(newText!=nullptr){
+        unsigned newTextLen=strlen(newText);
+        textData=new char[newTextLen+1];
+        strcpy(textData,newText);
+        textDataLenght=newTextLen;
+        return;
+    }
+    else {
+        textData=new char[8];//da napravia constanta=8;
+        return setText("Unknown.txt",textData,newTextLenght);//malko zavisi ot povedeneieto na kompilatora za da prevurne unknown v const char...
 
     }
 }
@@ -44,6 +58,34 @@ void Book::setISBN(const char* newISBN){
 
     }
 }
+void Book::changeText(const char* newText, char* textData, unsigned& textDataLenght){
+    if((&newText)!=(&textData)){
+        delete[] textData;
+        setText(newText,textData,textDataLenght);
+        return;
+    }
+    return;
+}
+void Book::changeFileName(const char* newFileName, char* textData, unsigned& textDataLenght){
+    if((&newFileName)!=(&textData)){
+        delete[] textData;
+        setFileName(newFileName,textData,textDataLenght);
+        return;
+    }
+    return;
+}
+void Book::changeISBN(const char* newISBN){
+    if((&newISBN)!=(&ISBN)){
+        delete[] ISBN;
+        setISBN(newISBN);
+    }
+    return;
+}
+void Book::changeRating(const unsigned& newRating){//triabva li izobshto tazi funkcia:|
+    setRating(newRating);
+    return;
+}
+
 void Book::free(){
     delete author[];
     delete title[];
@@ -52,7 +94,7 @@ void Book::free(){
     delete ISBN[];
 }
 
-Book::Book(const char* newAuthor, const char* newTitle, const char* newFile, const char* newDesc, const unsigned& newRating, const char* newISBN){
+Book::Book(const char* newAuthor="Unknown", const char* newTitle="Unknown", const char* newFile="Unknown.txt", const char* newDesc="Unknown", const unsigned& newRating=0, const char* newISBN="0000000000000"){
     setText(newAuthor,author,authorLenght);
     setText(newTitle,title,titleLenght);
     setText(newFile,fileName,fileNameLenght);
@@ -60,7 +102,7 @@ Book::Book(const char* newAuthor, const char* newTitle, const char* newFile, con
     setRating(newRating);
     setISBN(newISBN);
 }
-Book::Book(const Book& other){//principno ne triabva da moje da ima neviarna informacia, triabvat li proverkite..?
+Book::Book(const Book& other){//principno ne triabva da moje da ima neviarna informacia, triabvat li proverkite..?//da, triabva da se zadeli pamet vse pak
     setText(other.author,author,authorLenght);
     setText(other.title,title,titleLenght);
     setText(other.fileName,fileName,fileNameLenght);
@@ -86,10 +128,63 @@ Book::Book(Book&& other){//presumcia, che ne triabvat proverki
     rating=other.rating;
 }
 
-const char* Book::getAuthor() const;
-const char* Book::getTitle() const;
-const char* Book::get() const;
+const char* Book::getAuthor() const{
+    return author;
+}
+const char* Book::getTitle() const{
+    return title;
+}
+const char* Book::getDescription() const{
+    return description;
+}
+const unsigned Book::getRating() const{
+    return rating;
+}
+const char* Book::getISBN() const{
+    return ISBN;
+}
 
 Book::~Book(){
     free();
+}
+
+std::ostream& operator<<(std::ostream& outputStream, const Book&) const{//chetene
+    outputStream<<Book.titleLenght<<" "<<(Book.title)*<<std::endl<<Book.authorLenght<<" "<<(Book.author)*<<std::endl<<Book.fileNameLenght<<" "<<(Book.fileName)*<<std::endl<<Book.rating<<std::endl<<(Book.ISBN)*<<std::endl<<Book.descLenght<<" "<<(Book.description)*<<std::endl;
+    return outputStream;
+}
+
+std::istream& operator>>(std::istream& inputStream, Book&){//vuvezgdane//e a sega de//losho mi stava ot tozi kod, moga li da go sukratia malko s niakoia obshta funcia@-@
+    char spacing;
+    unsigned dataSizes;
+    char* textData;
+
+    inputStream>>dataSizes>>spacing;//titlelengh
+    textData=new char[dataSizes+1];
+    inputStream>>textData>>spacing;//title
+    Book.changeText(textData,Book.title,Book.titleLenght);//zapis
+    delete[] textData;//free
+    inputStream>>dataSizes>>spacing;//authorlengh
+    textData=new char[dataSizes+1];
+    inputStream>>textData>>spacing;//author
+    Book.changeText(textData,Book.author,Book.authorLenght);//zapis
+    delete[] textData;//free
+    inputStream>>dataSizes>>spacing;//filenamelengh
+    textData=new char[dataSizes+1];
+    inputStream>>textData>>spacing;//filename
+    Book.changeFileName(textData,Book.fileName,Book.fileNameLenght);//zapis
+    delete[] textData;//free
+    inputStream>>dataSizes>>spacing;//rating
+    Book.changeRating(dataSizes);//zapis
+    dataSizes=ISBN_LEN;//isbn lenght
+    textData=new char[dataSizes+1];
+    inputStream>>textData>>spacing;//isbn
+    Book.changeISBN(textData);//zapis
+    delete[] textData;//free
+    inputStream>>dataSizes>>spacing;//descr lenght
+    textData=new char[dataSizes+1];
+    inputStream>>textData>>spacing;//description
+    Book.changeText(textData,Book.description,Book.descLenght);//zapis
+    delete[] textData;//free
+
+    return inputStream;
 }
