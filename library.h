@@ -8,18 +8,22 @@ class Library{
     unsigned capacity;
     char* bookListFile;
 
+    char* adminPassword=new char[strlen("adminpassword23")+1];//izglezgdza mi tromavo :/
+    strcpy(adminPassword,"adminpassword23");
     bool adminLogIn;
-public:
+
     void resizeBooks();
     void sortBooksByTitle();
     void sortBooksByISBN();
     void sortBooksByAuthor();
     void sortBooksByRating();
     void updateBookListFile(const char*);//da se paziat po isbn
-    bool doesTextMatch(const char*) const;
+    bool doesTextMatch(const char*, const char*) const;// po dobre da e friend
     void free();
+public:
 
-    Library(const char* libraryFile);
+
+    Library(const char* libraryFile, const unsigned& BooksNumber);
     Library();
 
     void inputAdminPassword(const char*);
@@ -27,7 +31,6 @@ public:
     void addBook(const Book&);
     void addBook(Book&&);//kak shte ima niakakva random instancia??
     void addBook(const char* newAuthor, const char* newTitle, const char* newFile, const char* newDesc, const unsigned& newRating, const char* newISBN);
-    void addBook(char* &&newAuthor, char* &&newTitle, char* &&newFile, char* &&newDesc, unsigned&& newRating, char* &&newISBN);//hmmm...
 
     void removeBook(const char*);//po ISBN, da nqma dublirane
 
