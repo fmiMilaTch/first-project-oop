@@ -143,6 +143,9 @@ const unsigned Book::getRating() const{
 const char* Book::getISBN() const{
     return ISBN;
 }
+const char* Book::getFileName() const{
+    return fileName;
+}
 
 Book::~Book(){
     free();
