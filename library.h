@@ -19,10 +19,18 @@ class Library{
     void sortBooksByAuthor();
     void sortBooksByRating();
     unsigned findNewBookISBNPosition(const char*);
-    void moveDownByOneFromPosition(const unsigned&);//neka da e prosto sus swapove ot kraia do position
-    void moveUpByOneFromPosition(const unsigned&);//same thing no ot position do bottom
-    bool doesISNBExist(const char*);
-    bool isBoolListFileUpdated=false;
+    unsigned findNewBookTitlePosition(const Book*);
+    unsigned findNewBookAuthorPositon(const Book*);
+    unsigned findNewBookRatingPosition(const Book*);
+    unsigned internalBinarySearchISBN(const char*, unsigned&, unsigned&, unsigned&);
+    unsigned internalBinarySearchTitle(const Book*, unsigned&, unsigned&, unsigned&);
+    unsigned internalBinarySearchAuthor(const Book*, unsigned&, unsigned&, unsigned&);
+    unsigned internalBinarySearchRating(const Book*, unsigned&, unsigned&, unsigned&);
+    void swapDownByOneFromPosition(const unsigned&, Book**);//neka da e prosto sus swapove ot kraia do position
+    void swapUpByOneFromPosition(const unsigned&, Book**);//same thing no ot position do bottom
+    bool internalDoesISBNExist(const char*, unsigned&, unsigned&, unsigned&);
+    bool doesISBNExist(const char*);
+    bool isBookListFileUpdated=false;
     void updateBookListFile();//da se paziat po isbn
     bool doesTextMatch(const char*, const char*) const;// po dobre da e friend//triabva li mi nakraia?, abstrakcia e ig, no triabva da napravia oshte 2 takiva togava, koeto si e prosto strcmp:/
     void free();
@@ -39,6 +47,7 @@ public:
     void addBook(const char* newAuthor, const char* newTitle, const char* newFile, const char* newDesc, const unsigned& newRating, const char* newISBN);
 
     void removeBook(const char*);//po ISBN, da nqma dublirane
+    void removeBookWithoutISBN(const char* title, const char* author);
 
     void sortByTitle() const;
     void sortByAuthor() const;
