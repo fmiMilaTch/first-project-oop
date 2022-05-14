@@ -11,28 +11,33 @@ class Library{
 
     char* adminPassword=new char[strlen("adminpassword23")+1];//izglezgdza mi tromavo :/
     strcpy(adminPassword,"adminpassword23");
-    bool adminLogIn;
+    bool adminLogIn=false;
 
     void resizeBooks();
     void sortBooksByTitle();
     void sortBooksByISBN();
     void sortBooksByAuthor();
     void sortBooksByRating();
+    void sortAnewBooks();
     unsigned findNewBookISBNPosition(const char*);
+    /*
     unsigned findNewBookTitlePosition(const Book*);
     unsigned findNewBookAuthorPositon(const Book*);
     unsigned findNewBookRatingPosition(const Book*);
+    */
     unsigned internalBinarySearchISBN(const char*, unsigned&, unsigned&, unsigned&);
+    /*
     unsigned internalBinarySearchTitle(const Book*, unsigned&, unsigned&, unsigned&);
     unsigned internalBinarySearchAuthor(const Book*, unsigned&, unsigned&, unsigned&);
     unsigned internalBinarySearchRating(const Book*, unsigned&, unsigned&, unsigned&);
+    */
     void swapDownByOneFromPosition(const unsigned&, Book**);//neka da e prosto sus swapove ot kraia do position
     void swapUpByOneFromPosition(const unsigned&, Book**);//same thing no ot position do bottom
     bool internalDoesISBNExist(const char*, unsigned&, unsigned&, unsigned&);
     bool doesISBNExist(const char*);
     bool isBookListFileUpdated=false;
+    bool areBookListsSorted;
     void updateBookListFile();//da se paziat po isbn
-    bool doesTextMatch(const char*, const char*) const;// po dobre da e friend//triabva li mi nakraia?, abstrakcia e ig, no triabva da napravia oshte 2 takiva togava, koeto si e prosto strcmp:/
     void free();
 public:
 
@@ -40,7 +45,7 @@ public:
     Library(const char* libraryFile, const unsigned& BooksNumber);
     Library();
 
-    void inputAdminPassword(const char*);
+    void logInAsAdmin(const char*);
 
     void addBook(const Book&);
     void addBook(Book&&);//kak shte ima niakakva random instancia??
@@ -49,15 +54,18 @@ public:
     void removeBook(const char*);//po ISBN, da nqma dublirane
     void removeBookWithoutISBN(const char* title, const char* author);
 
-    void sortByTitle() const;
-    void sortByAuthor() const;
-    void sortByRaiting() const;
+    void sortedByTitleDescending() const;
+    void sortedByAuthorDescending() const;
+    void sortedByRaitingDescending() const;
+    void sortedByTitleAscending() const;
+    void sortedByAuthorAscending() const;
+    void sortedByRaitingAscending() const;
 
     void searchAuthor(const char*) const;
     void searchTitle(const char*) const;
     void searchISBN(const char*) const;
-    void searchDescription(const char*) const;//!!!
-    void readBook(const char*) const;//da razdelia li na 3 otdelni?
+    void searchDescription(const char*) const;//!!!//niama da mi stigne vremeto :(
+    //void readBook(const char*) const;//da razdelia li na 3 otdelni?
 
 
 
