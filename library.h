@@ -19,22 +19,16 @@ class Library{
     void sortBooksByAuthor();
     void sortBooksByRating();
     void sortAnewBooks();
-    unsigned findNewBookISBNPosition(const char*);
-    /*
-    unsigned findNewBookTitlePosition(const Book*);
-    unsigned findNewBookAuthorPositon(const Book*);
-    unsigned findNewBookRatingPosition(const Book*);
-    */
-    unsigned internalBinarySearchISBN(const char*, unsigned&, unsigned&, unsigned&);
-    /*
-    unsigned internalBinarySearchTitle(const Book*, unsigned&, unsigned&, unsigned&);
-    unsigned internalBinarySearchAuthor(const Book*, unsigned&, unsigned&, unsigned&);
-    unsigned internalBinarySearchRating(const Book*, unsigned&, unsigned&, unsigned&);
-    */
-    void swapDownByOneFromPosition(const unsigned&, Book**);//neka da e prosto sus swapove ot kraia do position
-    void swapUpByOneFromPosition(const unsigned&, Book**);//same thing no ot position do bottom
-    bool internalDoesISBNExist(const char*, unsigned&, unsigned&, unsigned&);
-    bool doesISBNExist(const char*);
+    unsigned findNewBookISBNPosition(const char*) const;
+    unsigned internalBinarySearchISBN(const char*, unsigned&, unsigned&, unsigned&) const;
+    void swapDownByOneFromPosition(const unsigned&, Book**);
+    void swapUpByOneFromPosition(const unsigned&, Book**);
+    int internalFindISBN(const char*, unsigned&, unsigned&, unsigned&) const;
+    int findISBN(const char*) const;
+    int internalFindTitle(const char*, unsigned&, unsigned&, unsigned&) const;
+    int findTitle(const char*) const;
+    int internalFindAuthor(const char*, unsigned&, unsigned&, unsigned&) const;
+    int findAuthor(const char*) const;
     bool isBookListFileUpdated=false;
     bool areBookListsSorted;
     void updateBookListFile();//da se paziat po isbn
@@ -48,11 +42,10 @@ public:
     void logInAsAdmin(const char*);
 
     void addBook(const Book&);
-    void addBook(Book&&);//kak shte ima niakakva random instancia??
+    void addBook(Book&&);
     void addBook(const char* newAuthor, const char* newTitle, const char* newFile, const char* newDesc, const unsigned& newRating, const char* newISBN);
 
-    void removeBook(const char*);//po ISBN, da nqma dublirane
-    void removeBookWithoutISBN(const char* title, const char* author);
+    void removeBook(const char*, bool&);
 
     void sortedByTitleDescending() const;
     void sortedByAuthorDescending() const;
@@ -64,10 +57,6 @@ public:
     void searchAuthor(const char*) const;
     void searchTitle(const char*) const;
     void searchISBN(const char*) const;
-    void searchDescription(const char*) const;//!!!//niama da mi stigne vremeto :(
-    //void readBook(const char*) const;//da razdelia li na 3 otdelni?
-
-
 
     ~Library();
 };
