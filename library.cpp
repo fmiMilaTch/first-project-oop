@@ -66,6 +66,9 @@ void Library::sortBooksByRating(){
         booksByRating[i]=biggestRating;
     }
 }
+void Library::sortAnewBooks(){
+
+}
 bool Library::internalDoesISBNExist(const char* newISBN, unsigned& left, unsigned& right, unsigned& mid){///da si pripomnia binarysearch _._...
     if(left==right){
         if(strcmp(newISBN,booksByISBN[left].ISBN)==0){
@@ -120,6 +123,7 @@ unsigned Library::internalBinarySearchISBN(const char* newBookISBN, unsigned& le
         }
     }
 }
+/*
 unsigned Library::internalBinarySearchTitle(const Book* newBookTitle, unsigned& left, unsigned& right, unsigned& mid){
     if(strcmp(newBookTitle.title,booksByTitle[mid].title)==0){
         if(strcmp(newBookTitle.ISBN,booksByTitle[mid].ISBN)>0){
@@ -179,6 +183,8 @@ unsigned Library::internalBinarySearchTitle(const Book* newBookTitle, unsigned& 
     }
 }
 //plache mi se kato si pomislia kak shte populvam greshki sled kato go kompiliram tozi kod
+*/
+
 void Library::swapUpByOneFromPosition(const unsigned& position, Book** booksList){
     Book* Swap;
     for(int i=numberOfBooks-1;i>position;i--){
@@ -207,6 +213,7 @@ unsigned Library::findNewBookISBNPosition(const char* newBookISBN){
     unsigned mid=(left+right+1)/2;
     return internalBinarySearchISBN(newBookISBN,left,right,mid);
 }
+/*
 unsigned Library::findNewBookTitlePosition(const Book* newBookTitle){
     if(strcmp(newBookTitle.title,booksByTitle[0].title)<0){
         return 0;
@@ -245,6 +252,30 @@ unsigned Library::findNewBookTitlePosition(const Book* newBookTitle){
 }
 unsigned Library::findNewBookAuthorPositon(const Book* newBookAuthor);
 unsigned Library::findNewBookRatingPosition(const Book* newBookrating);
+*/
+void Library::resizeBooks(){
+    unsigned newCapacity=capacity*2;
+    Book** newBooksByISBN, newBooksByTitle, newBooksByAuthor, newBooksByRating;
+    newBooksByISBN=new Book* [newCapacity];
+    newBooksByTitle=new Book* [newCapacity];
+    newBooksByAuthor=new Book* [newCapacity];
+    newBooksByRating=new Book* [newCapacity];
+    for(unsigned i=0; i<numberOfBooks; i++){
+        newBooksByISBN[i]=booksByISBN[i];
+        newBooksByTitle[i]=booksByTitle[i];
+        newBooksByAuthor[i]=booksByAuthor[i];
+        newBooksByRating[i]=booksByRating[i];
+    }
+    delete[] booksByISBN;
+    delete[] booksByTitle;
+    delete[] booksByAuthor;
+    delete[] booksByRating;
+    booksByISBN=newBooksByISBN;
+    booksByTitle=newBooksByTitle;
+    booksByAuthor=newBooksByAuthor;
+    booksByRating=newBooksByRating;
+    capacity=newCapacity;
+}
 Library::Library(){
     numberOfBooks=0;
     capacity=50;//50 mogze pak da constanta?
@@ -254,12 +285,13 @@ Library::Library(){
     booksByISBN=new Book* [capacity];
     booksByAuthor=new Book* [capacity];
     booksByRating=new Book* [capacity];
+    areBookListsSorted=false;
 }
 Library::Library(const char* libraryFile, const unsigned& BooksNumber){
-    std::ifstream inputStream(*(libraryFile));
+    std::ifstream inputStream(libraryFile);
     if(inputStream.is_open()){
         numberOfBooks=BooksNumber;
-        capacity=((numberOfBooks>DEFAULT_CAPACITY)?((numberOfBooks/DEFAULT_CAPACITY+1)*DEFAULT_CAPACITY):DEFAULT_CAPACITY);
+        capacity=((numberOfBooks>DEFAULT_CAPACITY)?((numberOfBooks/DEFAULT_CAPACITY+1)*DEFAULT_CAPACITY):DEFAULT_CAPACITY);///moge tova pak da go pogledna da sym sigurna
         booksByTitle=new Book* [capacity];
         booksByISBN=new Book* [capacity];
         booksByAuthor=new Book* [capacity];
@@ -268,6 +300,7 @@ Library::Library(const char* libraryFile, const unsigned& BooksNumber){
             booksByISBN[i]=new Book;
             inputStream>>*(booksByISBN[i]);
         }
+        inputStream.close();
         sortBooksByISBN();
         for(int i=0;i<numberOfBooks;i++){
             booksByTitle[i]=booksByISBN[i];
@@ -293,6 +326,63 @@ Library::Library(const char* libraryFile, const unsigned& BooksNumber){
         booksByRating=new Book* [capacity];
     }
 }
+void Library::logInAsAdmin(const char* password){
+    if(strcmp(password,adminPassword)==0){
+        std::cout<<"Admin log-in successful!"<<std::endl;
+        adminLogIn=true;
+        return;
+    }
+    std::cout<<"Password incorrect."<<std::endl;
+}
+void Library::sortedByTitleDescending() const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    for(unsigned i=0; i<numberOfBooks; i++){
+        std::cout<<booksByTitle[i].title<<",  "<<booksByTitle[i].author<<",  "<<booksByTitle[i].ISBN<<std::endl;
+    }
+}
+void Library::sortedByAuthorDescending() const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    for(unsigned i=0; i<numberOfBooks; i++){
+        std::cout<<booksByAuthor[i].title<<",  "<<booksByAuthor[i].author<<",  "<<booksByAuthor[i].ISBN<<std::endl;
+    }
+}
+void Library::sortedByRaitingDescending() const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    for(unsigned i=0; i<numberOfBooks; i++){
+        std::cout<<booksByRating[i].title<<",  "<<booksByRating[i].author<<",  "<<booksByRating[i].ISBN<<std::endl;
+    }
+}
+void Library::sortedByTitleAscending() const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    for(unsigned i=numberOfBooks-1; i>=0; i--){
+        std::cout<<booksByTitle[i].title<<",  "<<booksByTitle[i].author<<",  "<<booksByTitle[i].ISBN<<std::endl;
+    }
+}
+void Library::sortedByAuthorAscending() const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    for(unsigned i=numberOfBooks-1; i>=0; i--){
+        std::cout<<booksByAuthor[i].title<<",  "<<booksByAuthor[i].author<<",  "<<booksByAuthor[i].ISBN<<std::endl;
+    }
+}
+
+void Library::sortedByRaitingAscending() const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    for(unsigned i=numberOfBooks; i>=0; i--){
+        std::cout<<booksByRating[i].title<<",  "<<booksByRating[i].author<<",  "<<booksByRating[i].ISBN<<std::endl;
+    }
+}
 void Library::addBook(const Book& other){///edin if i ako e purva kniga v masiva, togawa prosto se dobavia
     if(adminLogIn){
 
@@ -303,24 +393,20 @@ void Library::addBook(const Book& other){///edin if i ako e purva kniga v masiva
             numberOfBooks++;
             booksByRating[0]=booksByAuthor[0]=booksByTitle[0]=booksByISBN[0]=new Book(other);
             isBookListFileUpdated=false;
+            areBookListsSorted=true;
             return;
         }
-        if(numberOfBooks==capacity){
+        if(numberOfBooks==capacity-1){
             resizeBooks();
         }
         if(numberOfBooks<capacity-1){
             if((strcmp(other.ISBN,"0000000000000")==0)||(!doesISBNExist(other.ISBN))){
-                booksByRating[numberOfBooks]=booksByAuthor[numberOfBooks]=booksByTitle[numberOfBooks]=booksByISBN[numberOfBooks]=new Book(other);
+                booksByISBN[numberOfBooks]=new Book(other);
                 unsigned ISBNPosition=findNewBookISBNPosition(booksByISBN[numberOfBooks].ISBN);
-                unsigned titlePosition=findNewBookTitlePosition(booksByTitle[numberOfBooks]);
-                unsigned authorPosition=findNewBookAuthorPositon(booksByAuthor[numberOfBooks]);
-                unsigned ratingPosition=findNewBookRatingPosition(booksByRating[numberOfBooks]);
                 numberOfBooks++;
                 swapUpByOneFromPosition(ISBNPosition,booksByISBN);
-                swapUpByOneFromPosition(titlePosition,booksByTitle);
-                swapUpByOneFromPosition(authorPosition,booksByAuthor);
-                swapUpByOneFromPosition(ratingPosition,booksByRating);
                 isBookListFileUpdated=false;
+                areBookListsSorted=false;
                 return;
             }
             else{
@@ -335,5 +421,93 @@ void Library::addBook(const Book& other){///edin if i ako e purva kniga v masiva
         return;
     }
 }
-void Library::addBook(Book&&);//kak shte ima niakakva random instancia??
-void Library::addBook(const char* newAuthor, const char* newTitle, const char* newFile, const char* newDesc, const unsigned& newRating, const char* newISBN);
+void Library::addBook(Book&& other){
+    if(adminLogIn){
+
+        if(strcmp(other.ISBN,"0000000000000")==0){
+            std::cout<<"This book has no ISBN. Some operations may not work properly, including its removal from the Library."<<std::endl;
+        }
+        if((numberOfBooks==0){
+            numberOfBooks++;
+            booksByRating[0]=booksByAuthor[0]=booksByTitle[0]=booksByISBN[0]=new Book(other);
+            isBookListFileUpdated=false;
+            areBookListsSorted=true;
+            return;
+        }
+        if(numberOfBooks==capacity-1){
+            resizeBooks();
+        }
+        if(numberOfBooks<capacity-1){
+            if((strcmp(other.ISBN,"0000000000000")==0)||(!doesISBNExist(other.ISBN))){
+                booksByISBN[numberOfBooks]=new Book(other);
+                unsigned ISBNPosition=findNewBookISBNPosition(booksByISBN[numberOfBooks].ISBN);
+                numberOfBooks++;
+                swapUpByOneFromPosition(ISBNPosition,booksByISBN);
+                isBookListFileUpdated=false;
+                areBookListsSorted=false;
+                return;
+            }
+            else{
+                std::cout<<"This book already exists in the Library."<<std::endl;
+                return;
+            }
+        }
+
+    }
+    else{
+        std::cout<<"Admin-only operation! Please first log-in as admin to do this operation!"<<std::endl;
+        return;
+    }
+}
+void Library::addBook(const char* newAuthor, const char* newTitle, const char* newFile, const char* newDesc, const unsigned& newRating, const char* newISBN){
+    if(adminLogIn){
+
+        if(strcmp(newISBN,"0000000000000")==0){
+            std::cout<<"This book has no ISBN. Some operations may not work properly, including its removal from the Library."<<std::endl;
+        }
+        if((numberOfBooks==0){
+            numberOfBooks++;
+            booksByRating[0]=booksByAuthor[0]=booksByTitle[0]=booksByISBN[0]=new Book(newAuthor,newTitle,newFile,newDesc,newRating,newISBN);
+            isBookListFileUpdated=false;
+            areBookListsSorted=true;
+            return;
+        }
+        if(numberOfBooks==capacity-1){
+            resizeBooks();
+        }
+        if(numberOfBooks<capacity-1){
+            if((strcmp(newISBN,"0000000000000")==0)||(!doesISBNExist(newISBN))){
+                booksByISBN[numberOfBooks]=new Book(newAuthor,newTitle,newFile,newDesc,newRating,newISBN);
+                unsigned ISBNPosition=findNewBookISBNPosition(booksByISBN[numberOfBooks].ISBN);
+                numberOfBooks++;
+                swapUpByOneFromPosition(ISBNPosition,booksByISBN);
+                isBookListFileUpdated=false;
+                areBookListsSorted=false;
+                return;
+            }
+            else{
+                std::cout<<"This book already exists in the Library."<<std::endl;
+                return;
+            }
+        }
+
+    }
+    else{
+        std::cout<<"Admin-only operation! Please first log-in as admin to do this operation!"<<std::endl;
+        return;
+    }
+}
+void Library::free(){
+    for(unsigned i=0;i<numberOfBooks;i++){
+        delete booksByISBN[i];
+    }
+    delete[] booksByISBN;
+    delete[] booksByTitle;
+    delete[] booksByAuthor;
+    delete[] booksByRating;
+    delete[] bookListFile;
+    delete[] adminPassword;
+}
+Library::~Library(){
+    free();
+}
