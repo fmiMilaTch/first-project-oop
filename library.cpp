@@ -11,11 +11,6 @@ void Library::sortBooksByISBN(){
                 biggestISBN=booksByISBN[k];
                 booksByISBN[k]=Swap;
             }
-            /*if((strcmp(biggestISBN.ISBN,booksByISBN[k].ISBN)==0)&&(strcmp(biggestISBN.title,booksByISBN[k].title)>0)){
-               Swap=biggestISBN;
-                biggestISBN=booksByISBN[k];
-                booksByISBN[k]=Swap;
-            }*///niama da poddurzham neizvestni isbn,pisna mi
         }
         booksByISBN[i]=biggestISBN;
     }
@@ -67,45 +62,123 @@ void Library::sortBooksByRating(){
     }
 }
 void Library::sortAnewBooks(){
-
-}
-bool Library::internalDoesISBNExist(const char* newISBN, unsigned& left, unsigned& right, unsigned& mid){///da si pripomnia binarysearch _._...
-    if(left==right){
-        if(strcmp(newISBN,booksByISBN[left].ISBN)==0){
-            return true;
+    for(int i=0;i<numberOfBooks;i++){
+            booksByTitle[i]=booksByISBN[i];
         }
-        return false;
-    }
+        sortBooksByTitle();
+        for(int i=0;i<numberOfBooks;i++){
+            booksByAuthor[i]=booksByTitle[i];
+            booksByRating[i]=booksByTitle[i];
+        }
+        sortBooksByAuthor();
+        sortBooksByRating();
+}
+int Library::internalFindISBN(const char* newISBN, unsigned& left, unsigned& right, unsigned& mid)const{
     if(strcmp(newISBN,booksByISBN[mid].ISBN)==0){
-        return true;
+        return mid;
     }
-    if(((mid==left)&&(strcmp(newISBN,booksByISBN[right].ISBN)!=0))||((mid==right)&&(strcmp(newISBN,booksByISBN[left].ISBN)!=0))){
-        return false;
-    }
-    if((mid==1)||(mid==numberOfBooks-1)){
-        return false;
+    if(left==right){
+        return -1;
     }
     if(strcmp(newISBN,booksByISBN[mid].ISBN)>0){
-        return internalDoesISBNExist(newISBN,left,mid-1,(left+mid)/2);
+        return internalFindISBN(newISBN,left,mid-1,(left+mid-1)/2);
     }
     if(strcmp(newISBN,booksByISBN[mid].ISBN)<0){
-        return internalDoesISBNExist(newISBN,mid+1,right,(right+mid+1)/2);
+        return internalFindISBN(newISBN,mid+1,right,(right+mid+1)/2);
     }
 
 }
-bool Library::doesISBNExist(const char* newISBN){
+int Library::findISBN(const char* newISBN)const{
     if(strcmp(booksByISBN[0].ISBN,newISBN)==0){
-        return true;
+        return 0;
+    }
+    if(strcmp(booksByISBN[0].ISBN,newISBN)<0){
+        return -1;
     }
     if(strcmp(booksByISBN[numberOfBooks-1].ISBN,newISBN)==0){
-        return true;
+        return numberOfBooks-1;
+    }
+    if(strcmp(booksByISBN[numberOfBooks-1].ISBN,newISBN)>0){
+        return -1;
     }
     unsigned left=0;
     unsigned right=numberOfBooks-1;
-    unsigned mid=(left+right+1)/2;
+    unsigned mid=(left+right)/2;
     return internalDoesISBNExist(newISBN,left,right,mid);
 }
-unsigned Library::internalBinarySearchISBN(const char* newBookISBN, unsigned& left, unsigned& right, unsigned& mid){
+int Library::internalFindTitle(const char* searchedTitle, unsigned& left, unsigned& right, unsigned& mid) const{
+    if(strcmp(searchedTitle,booksByTitle[mid].title)==0){
+        unsigned i=mid+1;
+        while(strcmp(searchedTitle,booksByTitle[i].title)==0){
+            i++;
+        }
+        return i-1;
+    }
+    if(left==right){
+        return -1;
+    }
+    if(strcmp(searchedTitle,booksByTitle[mid].title)<0){
+        return internalFindTitle(searchedTitle,left,mid-1,(left+mid-1)/2);
+    }
+    if(strcmp(searchedTitle,booksByTitle[mid].title)>0){
+        return internalFindTitle(searchedTitle,mid+1,right,(right+mid+1)/2);
+    }
+}
+int Library::findTitle(const char* searchedTitle) const{
+    if(strcmp(booksByTitle[0].title,searchedTitle)==0){
+        return 0;
+    }
+    if(strcmp(booksByTitle[0].title,searchedTitle)>0){
+        return -1;
+    }
+    if(strcmp(booksByTitle[numberOfBooks-1].title,searchedTitle)==0){
+        return numberOfBooks-1;
+    }
+    if(strcmp(booksByTitle[numberOfBooks-1].title,searchedTitle)<0){
+        return -1;
+    }
+    unsigned left=0;
+    unsigned right=numberOfBooks-1;
+    unsigned mid=(left+right)/2;
+    return internalFindTitle(searchedTitle,left,right,mid);
+}
+int Library::internalFindAuthor(const char* searchedAuthor, unsigned& left, unsigned& right, unsigned& mid)const{
+    if(strcmp(searchedAuthor,booksByAuthor[mid].author)==0){
+        unsigned i=mid+1;
+        while(strcmp(searchedAuthor,booksByAuthor[i].author)==0){
+            i++;
+        }
+        return i-1;
+    }
+    if(left==right){
+        return -1;
+    }
+    if(strcmp(searchedAuthor,booksByAuthor[mid].author)<0){
+        return internalFindAuthor(searchedAuthor,left,mid-1,(left+mid-1)/2);
+    }
+    if(strcmp(searchedAuthor,booksByAuthor[mid].author)>0){
+        return internalFindAuthor(searchedAuthor,mid+1,right,(right+mid+1)/2);
+    }
+}
+int Library::findAuthor(const char* searchedAuthor) const{
+    if(strcmp(booksByAuthor[0].author,searchedAuthor)==0){
+        return 0;
+    }
+    if(strcmp(booksByAuthor[0].author,searchedAuthor)>0){
+        return -1;
+    }
+    if(strcmp(booksByAuthor[numberOfBooks-1].author,searchedAuthor)==0){
+        return numberOfBooks-1;
+    }
+    if(strcmp(booksByAuthor[numberOfBooks-1].author,searchedAuthor)<0){
+        return -1;
+    }
+    unsigned left=0;
+    unsigned right=numberOfBooks-1;
+    unsigned mid=(left+right)/2;
+    return internalFindAuthor(searchedAuthor,left,right,mid);
+}
+unsigned Library::internalBinarySearchISBN(const char* newBookISBN, unsigned& left, unsigned& right, unsigned& mid) const{
     if(strcmp(newBookISBN,booksByISBN[mid].ISBN)>0){
         if(strcmp(newBookISBN,booksByISBN[mid-1].ISBN)<0){
            return mid;
@@ -123,67 +196,6 @@ unsigned Library::internalBinarySearchISBN(const char* newBookISBN, unsigned& le
         }
     }
 }
-/*
-unsigned Library::internalBinarySearchTitle(const Book* newBookTitle, unsigned& left, unsigned& right, unsigned& mid){
-    if(strcmp(newBookTitle.title,booksByTitle[mid].title)==0){
-        if(strcmp(newBookTitle.ISBN,booksByTitle[mid].ISBN)>0){
-            unsigned i=mid-1;
-            while((strcmp(newBookTitle.title,booksByTitle[i].title)==0)&&(strcmp(newBookTitle.ISBN,booksByTitle[i].ISBN)>0)){
-                i--;
-            }
-            return i;
-        }
-        if(strcmp(newBookTitle.ISBN,booksByTitle[mid].ISBN)<0){
-            unsigned i=mid+1;
-            while((strcmp(newBookTitle.title,booksByTitle[i].title)==0)&&(strcmp(newBookTitle.ISBN,booksByTitle[i].ISBN)<0)){
-                i++;
-            }
-            return i;
-        }
-    }
-    if(strcmp(newBookTitle.title,booksByTitle[mid].title)<0){
-        if(strcmp(newBookTitle.title,booksByTitle[mid-1].title)>0){
-           return mid;
-        }
-        if(strcmp(newBookTitle.title,booksByTitle[mid-1].title)<0){
-            return internalBinarySearchTitle(newBookTitle,left,mid-1,(left+mid)/2);
-        }
-        if(strcmp(newBookTitle.title,booksByTitle[mid-1].title)==0){
-            if(strcmp(newBookTitle.ISBN,booksByTitle[mid-1].ISBN)>0){
-                unsigned i=mid-2;
-                while((strcmp(newBookTitle.title,booksByTitle[i].title)==0)&&(strcmp(newBookTitle.ISBN,booksByTitle[i].ISBN)>0)){
-                    i--;
-                }
-                return i;
-            }
-            if(strcmp(newBookTitle.ISBN,booksByTitle[mid-1].ISBN)<0){
-                return mid;
-            }
-        }
-    }
-    if(strcmp(newBookTitle.title,booksByTitle[mid].title)>0){
-        if(strcmp(newBookTitle.title,booksByTitle[mid+1].title)<0){
-            return mid+1;
-        }
-        if(strcmp(newBookTitle.title,booksByTitle[mid+1].title)>0){
-            return internalBinarySearchTitle(newBookTitle,mid+1,right,(mid+1+right)/2);
-        }
-        if(strcmp(newBookTitle.title,booksByTitle[mid+1].title)==0){
-            if(strcmp(newBookTitle.ISBN,booksByTitle[mid+1].ISBN)>0){
-                return mid+1;
-            }
-            if(strcmp(newBookTitle.ISBN,booksByTitle[mid+1].ISBN)<0){
-                unsigned i=mid+2;
-                while((strcmp(newBookTitle.title,booksByTitle[i].title)==0)&&(strcmp(newBookTitle.ISBN,booksByTitle[i].ISBN)<0)){
-                    i++;///za da izleze ot granici triabva da stane '=numberofbooks+1', no tova e veche provereno oshte v nachaloto predi tazi funkcia. ako ne e ot tazi strana, to niama kak da stigne do tuk...
-                }
-                return i;
-            }
-        }
-    }
-}
-//plache mi se kato si pomislia kak shte populvam greshki sled kato go kompiliram tozi kod
-*/
 
 void Library::swapUpByOneFromPosition(const unsigned& position, Book** booksList){
     Book* Swap;
@@ -201,7 +213,7 @@ void Library::swapDownByOneFromPosition(const unsigned& position, Book** booksLi
         bookList[i+1]=Swap;
     }
 }
-unsigned Library::findNewBookISBNPosition(const char* newBookISBN){
+unsigned Library::findNewBookISBNPosition(const char* newBookISBN) const{
     if(strcmp(newBookISBN,booksByISBN[0].ISBN)>0){
         return 0;
     }
@@ -213,46 +225,7 @@ unsigned Library::findNewBookISBNPosition(const char* newBookISBN){
     unsigned mid=(left+right+1)/2;
     return internalBinarySearchISBN(newBookISBN,left,right,mid);
 }
-/*
-unsigned Library::findNewBookTitlePosition(const Book* newBookTitle){
-    if(strcmp(newBookTitle.title,booksByTitle[0].title)<0){
-        return 0;
-    }
-    if(strcmp(newBookTitle.title,booksByTitle[0].title)==0){
-        if(strcmp(newBookTitle.ISBN,booksByTitle[0].ISBN)>0){
-            return 0;
-        }
-        if(strcmp(newBookTitle.ISBN,booksByTitle[0].ISBN)<0){
-            int i=1;
-            while((strcmp(newBookTitle.title,booksByTitle[i].title)==0)&&(strcmp(newBookTitle.ISBN,booksByTitle[i].ISBN)<0)){
-                i++;
-            }
-            return i;
-        }
-    }
-    if(strcmp(newBookTitle.title,booksByTitle[numberOfBooks-1].title)>0){
-        return numberOfBooks;
-    }
-    if(strcmp(newBookTitle.title,booksByTitle[numberOfBooks-1].title)==0){
-        if(strcmp(newBookTitle.ISBN,booksByTitle[numberOfBooks-1].ISBN)<0){
-            return numberOfBooks;
-        }
-        if(strcmp(newBookTitle.ISBN,booksByTitle[numberOfBooks-1].ISBN)>0){
-            int i=numberOfBooks-2;
-            while((strcmp(newBookTitle.title,booksByTitle[i].title)==0)&&(strcmp(newBookTitle.ISBN,booksByTitle[i].ISBN)>0)){
-                i--;
-            }
-            return i;
-        }
-    }
-    unsigned left=0;
-    unsigned right=numberOfBooks-1;
-    unsigned mid=(left+right+1)/2;
-    return internalBinarySearchTitle(newBookTitle,left,right,mid);
-}
-unsigned Library::findNewBookAuthorPositon(const Book* newBookAuthor);
-unsigned Library::findNewBookRatingPosition(const Book* newBookrating);
-*/
+
 void Library::resizeBooks(){
     unsigned newCapacity=capacity*2;
     Book** newBooksByISBN, newBooksByTitle, newBooksByAuthor, newBooksByRating;
@@ -302,16 +275,7 @@ Library::Library(const char* libraryFile, const unsigned& BooksNumber){
         }
         inputStream.close();
         sortBooksByISBN();
-        for(int i=0;i<numberOfBooks;i++){
-            booksByTitle[i]=booksByISBN[i];
-        }
-        sortBooksByTitle();
-        for(int i=0;i<numberOfBooks;i++){
-            booksByAuthor[i]=booksByTitle[i];
-            booksByRating[i]=booksByTitle[i];
-        }
-        sortBooksByAuthor();
-        sortBooksByRating();
+        sortAnewBooks();
         bookListFile=new char[strlen(libraryFile)+1];
         strcpy(bookListFile,libraryFile);
     }
@@ -379,9 +343,48 @@ void Library::sortedByRaitingAscending() const{
     if(!areBookListsSorted){
         sortAnewBooks();
     }
-    for(unsigned i=numberOfBooks; i>=0; i--){
+    for(unsigned i=numberOfBooks-1; i>=0; i--){
         std::cout<<booksByRating[i].title<<",  "<<booksByRating[i].author<<",  "<<booksByRating[i].ISBN<<std::endl;
     }
+}
+void Library::searchTitle(const char* searchedTitle) const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    int position=findTitle(searchedTitle);
+    if(position==(-1)){
+        std::cout<<"No matching results found."<<std::endl;
+        return;
+    }
+    while((position<numberOfBooks)&&(strcmp(booksByTitle[position].title,searchedTitle)==0)){
+        std::cout<<booksByTitle[position].title<<",  "<<booksByTitle[position].author<<", "<<booksByTitle[position].ISBN<<std::endl;
+        position++;
+    }
+    return;
+}
+void Library::searchAuthor(const char* searchedAuthor) const{
+    if(!areBookListsSorted){
+        sortAnewBooks();
+    }
+    int position=findAuthor(searchedAuthor);
+    if(position==(-1)){
+        std::cout<<"No matching results found."<<std::endl;
+        return;
+    }
+    while((position<numberOfBooks)&&(strcmp(booksByAuthor[position].author,searchedAuthor)==0)){
+        std::cout<<booksByAuthor[position].title<<",  "<<booksByAuthor[position].author<<", "<<booksByAuthor[position].ISBN<<std::endl;
+        position++;
+    }
+    return;
+}
+void Library::searchISBN(const char* searchedISBN) const{
+    int position=findISBN(searchedISBN);
+    if(position==(-1)){
+        std::cout<<"Book does not exist in the Library."<<std::endl;
+        return;
+    }
+    std::cout<<booksByISBN[position].title<<",  "<<booksByISBN[position].author<<",  "<<booksByISBN[position].ISBN<<std::endl;
+    return;
 }
 void Library::addBook(const Book& other){///edin if i ako e purva kniga v masiva, togawa prosto se dobavia
     if(adminLogIn){
@@ -400,7 +403,7 @@ void Library::addBook(const Book& other){///edin if i ako e purva kniga v masiva
             resizeBooks();
         }
         if(numberOfBooks<capacity-1){
-            if((strcmp(other.ISBN,"0000000000000")==0)||(!doesISBNExist(other.ISBN))){
+            if((strcmp(other.ISBN,"0000000000000")==0)||(findISBN(other.ISBN)==(-1))){
                 booksByISBN[numberOfBooks]=new Book(other);
                 unsigned ISBNPosition=findNewBookISBNPosition(booksByISBN[numberOfBooks].ISBN);
                 numberOfBooks++;
@@ -438,7 +441,7 @@ void Library::addBook(Book&& other){
             resizeBooks();
         }
         if(numberOfBooks<capacity-1){
-            if((strcmp(other.ISBN,"0000000000000")==0)||(!doesISBNExist(other.ISBN))){
+            if((strcmp(other.ISBN,"0000000000000")==0)||(findISBN(other.ISBN)==(-1))){
                 booksByISBN[numberOfBooks]=new Book(other);
                 unsigned ISBNPosition=findNewBookISBNPosition(booksByISBN[numberOfBooks].ISBN);
                 numberOfBooks++;
@@ -476,7 +479,7 @@ void Library::addBook(const char* newAuthor, const char* newTitle, const char* n
             resizeBooks();
         }
         if(numberOfBooks<capacity-1){
-            if((strcmp(newISBN,"0000000000000")==0)||(!doesISBNExist(newISBN))){
+            if((strcmp(newISBN,"0000000000000")==0)||((findISBN(newISBN))==(-1))){
                 booksByISBN[numberOfBooks]=new Book(newAuthor,newTitle,newFile,newDesc,newRating,newISBN);
                 unsigned ISBNPosition=findNewBookISBNPosition(booksByISBN[numberOfBooks].ISBN);
                 numberOfBooks++;
@@ -496,6 +499,31 @@ void Library::addBook(const char* newAuthor, const char* newTitle, const char* n
         std::cout<<"Admin-only operation! Please first log-in as admin to do this operation!"<<std::endl;
         return;
     }
+}
+void Library::removeBook(const char* ISBNtoDelete, bool deleteBookFileContents){
+    if(adminLogIn){
+        int position=findISBN(ISBNtoDelete);
+        if(position==(-1)){
+            std::cout<<"This book is not in the Library."<<std::endl;
+            return;
+        }
+        if(deleteBookFileContents){
+            std::ofstream fileToDelete(booksByISBN[position].fileName,std::ios::trunk);
+            if(!fileToDelete.is_open()){
+                std::cout<<"File could not be opened."<<std::endl;
+            }
+            fileToDelete.close();
+
+        }
+        swapDownByOneFromPosition(position,booksByISBN);
+        delete[] booksByISBN[numberOfBooks-1];
+        numberOfBooks--;
+        areBookListsSorted=false;
+        std::cout<<"Book has been deleted from the library!"<<std::endl;
+        return;
+    }
+    std::cout<<"Admin-only operation! Please first log-in as admin to do this operation!"<<std::endl;
+    return;
 }
 void Library::free(){
     for(unsigned i=0;i<numberOfBooks;i++){
