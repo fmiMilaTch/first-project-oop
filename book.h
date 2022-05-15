@@ -21,6 +21,7 @@ class Book{
     void setText(const char*, char*, unsigned&);
     void setFileName(const char*, char*, unsigned&);//pochti identichno na setText, mozge da napravia edna funkcia s default stoinost;;
     void setISBN(const char*);
+    bool onlyNumbers(const char*) const;
     void setRating(const unsigned&);
     void changeText(const char*, char*, unsigned&);
     void changeFileName(const char*, char*, unsigned&);
@@ -31,10 +32,6 @@ class Book{
 public:
     friend class Library;
 
-
-    bool onlyNumbers(const char*) const;//uh toia const...i char*...// obikn funkcia
-    //bool appropLenght(const char*)const;//dali da ne gi napravia friend?//a ne shto ne prosto strlen^^;
-    //bool validFileName(const char*) const//triabva li mi takova neshto?
 
 
     const char* getAuthor() const;
@@ -48,8 +45,8 @@ public:
     Book(const Book& other);
     Book(Book&& other);
 
-    friend std::ostream& operator<<(std::ostream&, const Book&) const;
-    friend std::istream& operator>>(std::istream&, Book&);//sega stana slozgnichko...
+    friend std::ostream& operator<<(std::ostream&, const Book&);
+    friend std::istream& operator>>(std::istream&, Book&);
 
     ~Book();
 };
